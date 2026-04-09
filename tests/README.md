@@ -43,28 +43,34 @@ Script-scope constants `SQLServer2022` (**16.0.0.0**) and `SQLServer2025` (**17.
 
 Database **compatibility level** friendly names (**Version120**–**Version170** → SQL Server 2014–2025) are resolved in the engine-information module using **`$enumValue.ToString()`** string keys so older SMO assemblies that lack newer enum members do not break module load; unknown values fall back to the raw enum string.
 
-## SqlPowerDocLogWriter (structured / PoshBot-style lines)
+## SqlPowerDocLogWriter (PoshBot-style JSON + multithreaded writer)
 
-`Modules/LogHelper` exposes **`SqlPowerDocLogWriter`** (class) and **`New-SqlPowerDocLogWriter`**. Each event appends **one UTF-8 line** to the configured file and mirrors to host streams (`Write-Information` / `Write-Warning` / `Write-Error` / `Write-Verbose` for **DEBUG**).
+`Modules/LogHelper` exposes **`SqlPowerDocLogWriter`** (class) and **`New-SqlPowerDocLogWriter`**. The writer uses a per-log-path named mutex plus synchronized file append so multiple callers/runspaces can log concurrently while preserving one JSON object per line in UTF-8.
 
-**Field order (single line):**
+### Canonical JSON fields
 
-1. **Timestamp** — UTC `DateTime.ToString('o')` (ISO-8601, ends with `Z`)
-2. **Severity** — `INFO`, `WARN`, `ERROR`, or `DEBUG` (uppercase)
-3. **Source** — bracketed label, default `SqlPowerDoc`
-4. **Message** — remainder of line (no embedded newlines)
+Each log line is a compact JSON object with:
 
-**Validation regex (entire line, after trim):**
+- `DateTime` — UTC ISO-8601 (`o`) ending with `Z`
+- `Severity` — `Normal`, `Warning`, `Error` (PoshBot-style)
+- `LogLevel` — `Info` or `Debug`
+- `Source` — logical component/source label
+- `ThreadId` — managed thread id of emitter
+- `Message` — message text (newlines normalized to spaces)
+- `Data` — optional payload (currently `null` in default methods)
 
-```regex
-^(?<ts>\d{4}-\d{2}-\d{2}T[\d:\.]+Z) (?<sev>INFO|WARN|ERROR|DEBUG) \[(?<src>[^\]]+)\] (?<msg>.*)$
-```
+### Stream mapping
 
-**Examples:**
+- `Info()` -> `Write-Information`
+- `Warn()` -> `Write-Warning`
+- `Error()` -> `Write-Error` (non-terminating)
+- `Debug()` -> `Write-Verbose`
 
-```text
-2026-04-08T14:32:01.2345678Z INFO [SqlPowerDoc] Inventory started
-2026-04-08T14:32:02.1234567Z WARN [MyScript] Retry 1 of 3
+### Example lines
+
+```json
+{"DateTime":"2026-04-09T09:26:51.1449948Z","Severity":"Normal","LogLevel":"Info","Source":"SqlPowerDoc","ThreadId":9,"Message":"Inventory started","Data":null}
+{"DateTime":"2026-04-09T09:26:51.2452912Z","Severity":"Warning","LogLevel":"Info","Source":"SqlPowerDoc","ThreadId":12,"Message":"Retry 1 of 3","Data":null}
 ```
 
 Tests: `tests/SqlPowerDocLogWriter.test.ps1`.

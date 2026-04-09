@@ -4,7 +4,7 @@ $classScript = Join-Path -Path $PSScriptRoot -ChildPath 'Classes\SqlPowerDocLogW
 function New-SqlPowerDocLogWriter {
     <#
     .SYNOPSIS
-        Creates a SqlPowerDocLogWriter that appends UTF-8 structured lines and mirrors to host streams.
+        Creates a SqlPowerDocLogWriter that appends one compact JSON line per event and mirrors to host streams.
     #>
     [CmdletBinding()]
     param(

@@ -164,11 +164,12 @@ flowchart LR
 ## Definition of Done
 
 - [ ] `[RED]` then `[GREEN]` commits recorded for writer tests.
-- [ ] `Run-AllTests.ps1` exits 0.
-- [ ] Format documented.
+- [x] `Run-AllTests.ps1` exits 0.
+- [x] Format documented.
 
 ## Plan phase completion
 
 - [x] Research / analysis / architecture / decomposition / parallelize / verifications
 
 **Plan judge score (orchestrator):** 4.6/5.0
+**Implementation judge score (5-panel):** 4.62/5.0
