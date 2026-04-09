@@ -1,3 +1,25 @@
+$classScript = Join-Path -Path $PSScriptRoot -ChildPath 'Classes\SqlPowerDocLogWriter.ps1'
+. $classScript
+
+function New-SqlPowerDocLogWriter {
+    <#
+    .SYNOPSIS
+        Creates a SqlPowerDocLogWriter that appends UTF-8 structured lines and mirrors to host streams.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string] $LogPath,
+
+        [Parameter()]
+        [string] $Source = 'SqlPowerDoc'
+    )
+    end {
+        [SqlPowerDocLogWriter]::new($LogPath, $Source)
+    }
+}
+
 ##########################
 # PRIVATE SCRIPT VARIABLES
 ##########################

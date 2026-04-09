@@ -70,7 +70,7 @@
 	ModuleList = @()
 
 	# List of all files packaged with this module
-	FileList = @('LogHelper.psm1')
+	FileList = @('LogHelper.psm1', 'Classes\SqlPowerDocLogWriter.ps1')
 
 	# Private data to pass to the module specified in ModuleToProcess
 	PrivateData = @{}
