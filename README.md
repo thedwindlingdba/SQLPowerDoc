@@ -1,5 +1,18 @@
 # **SQL Server & Windows Documentation Using Windows PowerShell**
 
+## Development branch
+
+Ongoing modernization work (PowerShell 7+, testing, and module refactors) targets the **`dev`** branch. Clone and `git checkout dev` before contributing to that effort.
+
+## Running tests
+
+- Install [Pester](https://pester.dev/) 5.x: `Install-Module Pester -MinimumVersion 5.0.0 -MaximumVersion 5.999999 -Scope CurrentUser -Force`
+- From repo root: `pwsh -File .\tests\Run-AllTests.ps1`
+
+See [tests/README.md](tests/README.md) for the vacuous-test guard recipe and fixture notes.
+
+---
+
 SQL Power Doc is a collection of Windows PowerShell scripts and modules that discover, document, and diagnose SQL Server instances and their underlying Windows OS & machine configurations. SQL Power Doc works with all versions of SQL Server from SQL Server 2000 through 2014, and all versions of Windows Server and consumer Windows Operating Systems from Windows 2000 and Windows XP through Windows Server 2012 R2 and Windows 8\. SQL Power Doc is also capable of documenting Windows Azure SQL Databases.
 
 ## Discover

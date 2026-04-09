@@ -339,3 +339,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database 
 healthchecksdb
+
+# Spec-driven design scratchpad (local only)
+.specs/scratchpad/
