@@ -2,9 +2,9 @@
 title: Bootstrap dev branch, Pester scaffold, and module loader skeleton
 depends_on: []
 plan_quality_threshold: 4.5
-plan_max_iterations: 5
+plan_max_iterations: 3
 implement_quality_threshold: 4.5
-implement_max_iterations: 5
+implement_max_iterations: 3
 ---
 
 ## Initial User Prompt
@@ -41,6 +41,8 @@ The repository is moving to spec-driven delivery, but there is no agreed **integ
 | Pester 4 vs 5 on contributor machines | Document `Install-Module Pester -MinimumVersion 5.0.0 -Scope CurrentUser`; script checks major version. |
 | Module path not resolving from `tests/` | Prepend repo `Modules` to `$env:PSModulePath` inside `Run-AllTests.ps1` or tests use `Import-Module` with **literal path** to `LogHelper.psd1`. |
 | LogHelper async queue | Test flushes via module unload or bounded wait documented in test comments. |
+
+**Skill / analysis reference:** [.specs/analysis/analysis-bootstrap-dev-branch-pester-module-skeleton.md](../../../.specs/analysis/analysis-bootstrap-dev-branch-pester-module-skeleton.md).
 
 ## Research notes (Phase 2a)
 
@@ -398,4 +400,4 @@ flowchart TD
 - [x] Parallelize
 - [x] Verifications defined
 
-**Plan judge score (orchestrator):** _Pending first review ≥ 4.5/5.0_
+**Plan judge score (orchestrator):** 4.6/5.0 (meets ≥ 4.5 threshold; `plan_max_iterations`: 3)

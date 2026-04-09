@@ -3,9 +3,9 @@ title: Implement SqlPowerDocSqlVersionMap and SQL Server 2022/2025 support
 depends_on:
   - bootstrap-dev-branch-pester-module-skeleton.chore.md
 plan_quality_threshold: 4.5
-plan_max_iterations: 5
+plan_max_iterations: 3
 implement_quality_threshold: 4.5
-implement_max_iterations: 5
+implement_max_iterations: 3
 ---
 
 ## Initial User Prompt
@@ -396,4 +396,4 @@ flowchart TD
 | Decomposition | 4.6 | Parallel 2∥3; merge point clear; Step 7 handles PS7. |
 | Verification rubrics | 4.5 | Weights sum to 1.0 per table; Panel on highest-risk step (4). |
 
-**Iteration note:** No iteration 2–5 required; if stakeholder rejects PS7 defer, re-run architecture slice for “minimal import fix” scope only.
+**Iteration note:** No further iterations required within **plan_max_iterations: 3**; if stakeholder rejects PS7 defer, re-run architecture slice for “minimal import fix” scope only.
