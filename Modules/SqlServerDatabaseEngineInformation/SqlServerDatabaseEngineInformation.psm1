@@ -24,6 +24,8 @@ New-Object -TypeName System.Version -ArgumentList '12.0.0.0' | New-Variable -Nam
 New-Object -TypeName System.Version -ArgumentList '13.0.0.0' | New-Variable -Name SQLServer2016 -Scope Script -Option Constant
 New-Object -TypeName System.Version -ArgumentList '14.0.0.0' | New-Variable -Name SQLServer2017 -Scope Script -Option Constant
 New-Object -TypeName System.Version -ArgumentList '15.0.0.0' | New-Variable -Name SQLServer2019 -Scope Script -Option Constant
+New-Object -TypeName System.Version -ArgumentList '16.0.0.0' | New-Variable -Name SQLServer2022 -Scope Script -Option Constant
+New-Object -TypeName System.Version -ArgumentList '17.0.0.0' | New-Variable -Name SQLServer2025 -Scope Script -Option Constant
 
 New-Variable -Name StandaloneDbEngine -Scope Script -Option Constant -Value 'Standalone'
 New-Variable -Name AzureDbEngine -Scope Script -Option Constant -Value 'Windows Azure SQL Database'
@@ -3942,7 +3944,13 @@ function Get-XmlDocumentConstraintValue($XmlDocumentConstraint) {
 }
 
 function Get-SqlServerVersionName([int]$MajorVersion, [int]$MinorVersion) {
-	if (($MajorVersion -eq 11) -and ($MinorVersion -eq 0)) { '2012' }
+	if (($MajorVersion -eq 17) -and ($MinorVersion -eq 0)) { '2025' }
+	elseif (($MajorVersion -eq 16) -and ($MinorVersion -eq 0)) { '2022' }
+	elseif (($MajorVersion -eq 15) -and ($MinorVersion -eq 0)) { '2019' }
+	elseif (($MajorVersion -eq 14) -and ($MinorVersion -eq 0)) { '2017' }
+	elseif (($MajorVersion -eq 13) -and ($MinorVersion -eq 0)) { '2016' }
+	elseif (($MajorVersion -eq 12) -and ($MinorVersion -eq 0)) { '2014' }
+	elseif (($MajorVersion -eq 11) -and ($MinorVersion -eq 0)) { '2012' }
 	elseif (($MajorVersion -eq 10) -and ($MinorVersion -eq 50)) { '2008 R2' }
 	elseif (($MajorVersion -eq 10) -and ($MinorVersion -eq 0)) { '2008' }
 	elseif (($MajorVersion -eq 9) -and ($MinorVersion -eq 0)) { '2005' }
@@ -8317,7 +8325,6 @@ function Get-DatabaseInformation {
 		$LastKnownGoodDbccCheckDbDate = $null
 		$DatabaseRoleMemberRole = $null
 		$DatabaseStatus = 'Microsoft.SqlServer.Management.Smo.DatabaseStatus' -as [Type]
-		$CompatibilityLevel = 'Microsoft.SqlServer.Management.Smo.CompatibilityLevel' -as [Type]
 		$DataCompressionType = 'Microsoft.SqlServer.Management.Smo.DataCompressionType' -as [Type]
 
 		$DbEngineType = [String](Get-DatabaseEngineTypeValue -DatabaseEngineType $Server.ServerType)
@@ -8821,17 +8828,22 @@ function Get-DatabaseInformation {
 						Options = New-Object -TypeName psobject -Property @{
 							Collation = $_.Collation # System.String Collation {get;set;}	# Duplicated in the general tab
 							RecoveryModel = if ($_.DatabaseOptions.RecoveryModel) { $_.DatabaseOptions.RecoveryModel.ToString() } else { $null } # Microsoft.SqlServer.Management.Smo.RecoveryModel RecoveryModel {get;set;}
-							CompatibilityLevel = switch ($_.CompatibilityLevel) {
-								$($CompatibilityLevel::Version60) { 'SQL Server 6.0 (60)' }
-								$($CompatibilityLevel::Version65) { 'SQL Server 6.5 (65)' }
-								$($CompatibilityLevel::Version70) { 'SQL Server 7.0 (70)' }
-								$($CompatibilityLevel::Version80) { 'SQL Server 2000 (80)' }
-								$($CompatibilityLevel::Version90) { 'SQL Server 2005 (90)' }
-								$($CompatibilityLevel::Version100) { 'SQL Server 2008 (100)' }
-								$($CompatibilityLevel::Version110) { 'SQL Server 2012 (110)' }
-								$null { 'Unknown' }
-								default { $_.ToString() }
-							} # Microsoft.SqlServer.Management.Smo.CompatibilityLevel CompatibilityLevel {get;set;}
+							CompatibilityLevel = $( $dbcl = $_.CompatibilityLevel; if ($null -eq $dbcl) { 'Unknown' } else { switch ($dbcl.ToString()) {
+								'Version60' { 'SQL Server 6.0 (60)' }
+								'Version65' { 'SQL Server 6.5 (65)' }
+								'Version70' { 'SQL Server 7.0 (70)' }
+								'Version80' { 'SQL Server 2000 (80)' }
+								'Version90' { 'SQL Server 2005 (90)' }
+								'Version100' { 'SQL Server 2008 (100)' }
+								'Version110' { 'SQL Server 2012 (110)' }
+								'Version120' { 'SQL Server 2014 (120)' }
+								'Version130' { 'SQL Server 2016 (130)' }
+								'Version140' { 'SQL Server 2017 (140)' }
+								'Version150' { 'SQL Server 2019 (150)' }
+								'Version160' { 'SQL Server 2022 (160)' }
+								'Version170' { 'SQL Server 2025 (170)' }
+								default { $dbcl.ToString() }
+							} } ) # Microsoft.SqlServer.Management.Smo.CompatibilityLevel CompatibilityLevel {get;set;}
 							ContainmentType = if ((($Server.Information.Version).CompareTo($SQLServer2012) -ge 0) -and ($_.ContainmentType)) { $_.ContainmentType.ToString() } else { $null } # Microsoft.SqlServer.Management.Smo.ContainmentType ContainmentType {get;set;}
 							OtherOptions = New-Object -TypeName psobject -Property @{
 								Automatic = New-Object -TypeName psobject -Property @{

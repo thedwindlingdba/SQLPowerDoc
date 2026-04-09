@@ -370,11 +370,17 @@ flowchart TD
 
 ## Definition of Done (Task Level)
 
-- [ ] `SQLServer2022` / `SQLServer2025` constants in both modules.
-- [ ] `Get-SqlServerVersionName` and fixture support 16/0 and 17/0.
-- [ ] Compatibility level mapping extended defensively for 120–170.
-- [ ] Pester suite passes; `tests/README.md` updated.
-- [ ] Step 7 triage documented (fix or defer with pointer).
+- [X] `SQLServer2022` / `SQLServer2025` constants in both modules.
+- [X] `Get-SqlServerVersionName` and fixture support 16/0 and 17/0 (and 12–15 RTM for parity).
+- [X] Compatibility level mapping extended defensively for 120–170.
+- [X] Pester suite passes; `tests/README.md` updated.
+- [X] Step 7 triage documented (fix or defer with pointer).
+
+### Implementation record (orchestrator)
+
+- **Step 1 / 6:** Grep for `SQLServer2019` / `15.0.0.0` under `Modules/*.psm1` showed only constant definitions—no “newest version” gates requiring change beyond this task.
+- **Step 7:** `Import-Module` on `SqlServerDatabaseEngineInformation.psd1` under **PowerShell 7** succeeded in the implementation environment (`pwsh -NoProfile -Command` with `Import-Module -Force`). **`Get-SqlServerVersionName`** remains **not** listed in `FunctionsToExport` (optional per spec); tests stay fixture-based.
+- **Step 9:** `pwsh -File .\tests\Run-AllTests.ps1` → exit **0** (all tests passed).
 
 ## Plan phase completion
 
