@@ -63,3 +63,13 @@ enum SqlPowerDocSchemaScope {
     View
     UserDefinedFunction
 }
+
+# The lifecycle a SqlPowerDocCollectorBase instance passes through (plan section 3.5). Ordinary
+# enum, not [Flags()]: a collector is in exactly one of these states at a time, never a
+# combination.
+enum SqlPowerDocCollectorStatus {
+    NotStarted
+    Running
+    Completed
+    Failed
+}
