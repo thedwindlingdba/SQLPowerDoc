@@ -86,7 +86,9 @@ Describe 'SqlPowerDocCollectorBase construction' -Tag 'Unit' {
 
             $collector = [SqlPowerDocCollectorBase]::new([SqlPowerDocFakePlatform]::new())
 
-            $collector.Errors | Should -Not -BeNullOrEmpty -Because 'the list itself must exist, even though it starts empty'
+            # An empty generic list unwraps to nothing across the pipeline, so the list itself
+            # (not its enumerated contents) is asserted directly here.
+            $null -eq $collector.Errors | Should -BeFalse -Because 'the list instance itself must exist, even though it starts empty'
             $collector.Errors.Count | Should -Be 0
         }
     }
