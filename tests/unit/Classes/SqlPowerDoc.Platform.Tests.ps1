@@ -72,16 +72,21 @@ Describe 'SqlPowerDocPlatform construction' -Tag 'Unit' {
         InModuleScope SqlPowerDoc {
             ('SqlPowerDocPlatform' -as [type]) | Should -Not -BeNullOrEmpty
 
+            # The Log call has to happen while the wrapper is still on the stack: a PSCmdlet
+            # outlives its invocation but its MyInvocation.MyCommand does not, and SqlPowerDocBase
+            # falls back to the class name once it is gone.
             function Invoke-A7ConstructionProbe {
                 [CmdletBinding()]
                 param()
-                [SqlPowerDocPlatform]::new($PSCmdlet)
+
+                $instance = [SqlPowerDocPlatform]::new($PSCmdlet)
+                $instance.Log('Verbose', 'probing capabilities')
+                $instance
             }
 
             $platform = Invoke-A7ConstructionProbe
             $platform | Should -Not -BeNullOrEmpty
             $platform.IsWindowsHost | Should -BeOfType [bool]
-            $platform.Log('Verbose', 'probing capabilities')
         }
 
         Should -Invoke -CommandName Write-PSFMessage -ModuleName SqlPowerDoc -Times 1 -Exactly -ParameterFilter {
