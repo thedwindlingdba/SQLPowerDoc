@@ -75,12 +75,17 @@ Describe 'SqlPowerDoc configuration schema' -Tag 'Unit' {
         }
     }
 
-    It 'exposes the full schema for a support-bundle dump via Get-PSFConfig -Module SqlPowerDoc' {
-        $keys = Get-PSFConfig -Module 'SqlPowerDoc' | Select-Object -ExpandProperty FullName
-        foreach ($expected in $script:ExpectedConfiguration) {
-            $keys | Should -Contain $expected.Name
-        }
-        $keys | Should -Contain 'SqlPowerDoc.Logging.Path'
+    # -ForEach, not a foreach over $script:ExpectedConfiguration inside the body: variables set in
+    # BeforeDiscovery belong to the discovery scope, which is only the same scope as the run when a
+    # single container is in play. Reading one from an It body fails as soon as the suite grows a
+    # second test file.
+    It 'exposes <Name> for a support-bundle dump via Get-PSFConfig -Module SqlPowerDoc' -ForEach $script:ExpectedConfiguration {
+        Get-PSFConfig -Module 'SqlPowerDoc' | Select-Object -ExpandProperty FullName | Should -Contain $Name
+    }
+
+    It 'exposes SqlPowerDoc.Logging.Path for a support-bundle dump via Get-PSFConfig -Module SqlPowerDoc' {
+        Get-PSFConfig -Module 'SqlPowerDoc' | Select-Object -ExpandProperty FullName |
+            Should -Contain 'SqlPowerDoc.Logging.Path'
     }
 
     It 'declares no configuration key referencing the excluded SqlServer module' {
