@@ -1,10 +1,10 @@
 #Requires -Version 7.4
 <#
-    Work item A1 — repository skeleton.
+    Work item A1 - repository skeleton.
 
     Asserts the shape of the new module tree: the source manifest, the dev-mode loader,
     the InvokeBuild task file, and the pinned dependency manifest. Everything here is
-    static analysis — nothing is imported and nothing is built — so the file runs on
+    static analysis - nothing is imported and nothing is built - so the file runs on
     Linux with no SQL Server, no Windows, and no build output present.
 #>
 
@@ -20,13 +20,13 @@ BeforeAll {
     $script:BuildScriptPath = Join-Path $script:RepositoryRoot 'SqlPowerDoc.build.ps1'
     $script:RequiresPath = Join-Path $script:RepositoryRoot 'build.requires.psd1'
 
-    function script:Test-PowerShellFileParses {
+    function script:Get-ParseErrorCount {
         param([Parameter(Mandatory)][string] $Path)
 
         $tokens = $null
         $errors = $null
         $null = [System.Management.Automation.Language.Parser]::ParseFile($Path, [ref] $tokens, [ref] $errors)
-        , @($errors)
+        @($errors).Count
     }
 }
 
@@ -122,7 +122,7 @@ Describe 'SqlPowerDoc dev-mode loader' -Tag 'Unit' {
     }
 
     It 'parses without errors' {
-        script:Test-PowerShellFileParses -Path $script:LoaderPath | Should -HaveCount 0
+        script:Get-ParseErrorCount -Path $script:LoaderPath | Should -Be 0
     }
 
     It 'dot-sources Classes, Private, and Public in that order' {
@@ -171,7 +171,7 @@ Describe 'SqlPowerDoc InvokeBuild task file' -Tag 'Unit' {
     }
 
     It 'parses without errors' {
-        script:Test-PowerShellFileParses -Path $script:BuildScriptPath | Should -HaveCount 0
+        script:Get-ParseErrorCount -Path $script:BuildScriptPath | Should -Be 0
     }
 
     It 'defines the <_> task' -ForEach @('Clean', 'Build', 'Lint', 'Test', 'Package') {
@@ -227,7 +227,7 @@ Describe 'SqlPowerDoc pinned dependencies' -Tag 'Unit' {
         $content | Should -Match '-Prerelease'
         $content | Should -Not -Match 'Install-Module'
 
-        script:Test-PowerShellFileParses -Path $installer | Should -HaveCount 0
+        script:Get-ParseErrorCount -Path $installer | Should -Be 0
     }
 }
 
@@ -239,7 +239,7 @@ Describe 'SqlPowerDoc Pester configuration' -Tag 'Unit' {
 
     It 'exists and parses' {
         $script:PesterConfigPath | Should -Exist
-        script:Test-PowerShellFileParses -Path $script:PesterConfigPath | Should -HaveCount 0
+        script:Get-ParseErrorCount -Path $script:PesterConfigPath | Should -Be 0
     }
 
     It 'returns a Pester configuration that excludes Windows-only tests on this host' {
@@ -248,9 +248,9 @@ Describe 'SqlPowerDoc Pester configuration' -Tag 'Unit' {
         $configuration | Should -BeOfType ([PesterConfiguration])
         $configuration.Run.Throw.Value | Should -BeTrue
 
-        $isWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+        $onWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
             [System.Runtime.InteropServices.OSPlatform]::Windows)
-        if (-not $isWindows) {
+        if (-not $onWindows) {
             $configuration.Filter.ExcludeTag.Value | Should -Contain 'RequiresWindows'
         }
         if (-not $env:SQLPOWERDOC_TEST_INSTANCE) {

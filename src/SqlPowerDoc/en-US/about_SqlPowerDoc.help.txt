@@ -1,0 +1,21 @@
+TOPIC
+    about_SqlPowerDoc
+
+SHORT DESCRIPTION
+    Discovers, documents, and diagnoses SQL Server instances and the Windows hosts
+    that run them.
+
+LONG DESCRIPTION
+    SqlPowerDoc collects configuration, security, agent, service, database, and
+    schema information from SQL Server instances and the machines hosting them, then
+    renders the result as an Excel workbook.
+
+    All SQL Server interaction goes through dbatools. All logging and configuration
+    goes through PSFramework. Workbook output goes through ImportExcel, so no Excel
+    installation is required.
+
+    This topic is a placeholder created with the repository skeleton (work item A1)
+    and is filled in by the documentation work item (E4).
+
+SEE ALSO
+    https://github.com/thedwindlingdba/SQLPowerDoc

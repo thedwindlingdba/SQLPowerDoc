@@ -43,6 +43,22 @@ pwsh -NoProfile -Command "Import-Module Pester; Invoke-Pester -Path /workspace/T
 
 `LogHelper` is the only module that is fully *functional* on Linux, but **7 of 8 modules import successfully** — see the import gotcha below. Mocked-seam unit tests, pure-logic tests, and `ImportExcel` output tests all run natively on Linux.
 
+### The v3 `SqlPowerDoc` module (in progress)
+
+The rewrite lives under `src/SqlPowerDoc/` and is built with InvokeBuild + ModuleBuilder. The legacy `Modules/` tree stays in place as the reference until the final work item removes it.
+
+```bash
+pwsh -NoProfile -File /workspace/build/Install-DevDependencies.ps1   # pinned toolchain, PSResourceGet only
+pwsh -NoProfile -Command "Import-Module InvokeBuild; Invoke-Build"   # Clean, Build, Lint, Test
+pwsh -NoProfile -File /workspace/Tests/Phase0-Verification/Verify-Toolchain.ps1
+```
+
+- Dependencies are pinned in `build.requires.psd1`. Install with `build/Install-DevDependencies.ps1`; never with the retired PowerShellGet cmdlets, and never the SQL Server PowerShell module (dbatools replaces it).
+- `Build` must run before `Lint` and `Test`: both operate on `output/SqlPowerDoc/<version>/`, never on the loose source files. PSScriptAnalyzer reports `TypeNotFound` on individual class files because a derived class's base type is declared in another file.
+- The source manifest's `FunctionsToExport` is `'*'` by design, so the dev loader's `Export-ModuleMember` is not filtered. ModuleBuilder replaces it with the real list at build time. Repo-wide lint therefore reports one expected `PSUseToExportFieldsInManifest` warning against `src/SqlPowerDoc/SqlPowerDoc.psd1`.
+- `Invoke-ScriptAnalyzer` throws an intermittent `NullReferenceException` from its own command cache on this VM (roughly one run in fifteen). The `Lint` task retries once and fails on a second throw.
+- The new suite is `tests/` (lowercase); the legacy Phase 0 suite is `Tests/`. They are distinct on Linux but collide on case-insensitive filesystems until the legacy tree is removed.
+
 ### Module structure
 
 All modules live under `Modules/`. Each has a `.psm1` (code) and most have a `.psd1` (manifest). All 8 modules and 5 scripts parse cleanly on PowerShell 7.x.
